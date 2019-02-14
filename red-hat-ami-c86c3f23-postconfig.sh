@@ -67,7 +67,7 @@ yum -y install libarchive-devel-3.1.2-10.el7_2.x86_64.rpm
 
 # EasyBuild cannot be used by root user, so we create one to take care of this
 
-EASYBUILD_USER="hpc"
+export EASYBUILD_USER="hpc"
 useradd $EASYBUILD_USER
 
 ##############################
@@ -88,34 +88,40 @@ chown -R ${EASYBUILD_USER}. ${HEAD}
 # Install Lua #
 ###############
 
-export LUA_VERSION=5.1.4.5
-export LUA_DIR=$HEAD/source/Lua/${LUA_VERSION}
-export LUA_PREFIX=$HEAD/$OS/$OS_VERSION/Common/software/Lua/${LUA_VERSION}
+export LUA_VERSION="5.1.4.5"
+export LUA_DIR="$HEAD/source/Lua/${LUA_VERSION}"
+export LUA_PREFIX="$HEAD/$OS/$OS_VERSION/Common/software/Lua/${LUA_VERSION}"
 mkdir -p ${LUA_DIR}
 cd ${LUA_DIR}
 wget https://sourceforge.net/projects/lmod/files/lua-${LUA_VERSION}.tar.gz
 tar -zxvf lua-${LUA_VERSION}.tar.gz
 cd lua-${LUA_VERSION}
 ./configure --prefix=${LUA_PREFIX} && make && make install
-export CPATH=${LUA_PREFIX}/include:$CPATH
-export PATH=${LUA_PREFIX}/bin:$PATH
-export LD_LIBRARY_PATH=${LUA_PREFIX}/lib:$LD_LIBRARY_PATH
+
+# Set enviroment to compile Lmod
+export CPATH="${LUA_PREFIX}/include:$CPATH"
+export PATH="${LUA_PREFIX}/bin:$PATH"
+export LD_LIBRARY_PATH="${LUA_PREFIX}/lib:$LD_LIBRARY_PATH"
 
 ################
 # Install Lmod #
 ################
 
-export LMOD_VERSION=7.8.18
-export LMOD_DIR=${HEAD}/source/Lmod/${LMOD_VERSION}
-export LMOD_PREFIX=${HEAD}/${OS}/${OS_VERSION}/Common/software/Lmod/${LMOD_VERSION}
+export LMOD_VERSION="7.8.18"
+export LMOD_DIR="${HEAD}/source/Lmod/${LMOD_VERSION}"
+export LMOD_PREFIX="${HEAD}/${OS}/${OS_VERSION}/Common/software/Lmod/${LMOD_VERSION}"
 mkdir -p ${LMOD_DIR}
 cd ${LMOD_DIR}
 wget https://github.com/TACC/Lmod/archive/$LMOD_VERSION.tar.gz
 tar -zxvf $LMOD_VERSION.tar.gz
 cd Lmod-${LMOD_VERSION}
 ./configure --prefix=${LMOD_PREFIX} && make install
+
+# Add path to modules to the MODULEPATH variable for the shell BASH
 sed -i '28iexport MODULEPATH=$(/scratch/scicomp/CentOS/7.5.1810/Common/software/Lmod/7.8.18/lmod/lmod/libexec/addto --append MODULEPATH /scratch/scicomp/CentOS/7.5.1810/Haswell/modules/all)' ${HEAD}/${OS}/${OS_VERSION}/Common/software/Lmod/${LMOD_VERSION}/lmod/lmod/init/profile
 ln -s ${HEAD}/${OS}/${OS_VERSION}/Common/software/Lmod/${LMOD_VERSION}/lmod/lmod/init/profile /etc/profile.d/lmod.sh
+
+# Set environment to install EasyBuild
 source /etc/profile.d/lmod.sh
 module load lmod
 
@@ -126,6 +132,8 @@ module load lmod
 export EASYBUILD_VERSION="3.8.1"
 export EASYBUILD_DIR="${HEAD}/source/EasyBuild/${EASYBUILD_VERSION}"
 export EASYBUILD_PREFIX="${HEAD}/${OS}/${OS_VERSION}/Common/software/EasyBuild/${EASYBUILD_VERSION}"
+
+# Configure EasyBuild
 cat <<EOF >> /etc/profile.d/easybuild.sh
 #!/bin/bash
 export EASYBUILD_PREFIX=${HEAD}/EasyBuild
@@ -136,6 +144,7 @@ export EASYBUILD_TMP_LOGDIR=${HEAD}/EasyBuild/tmp
 export EASYBUILD_MODULES_TOOL=Lmod 
 EOF
 
+# EasyBuild boostrap procedure
 cd ${EASYBUILD_DIR}
 su - ${EASYBUILD_USER} -c "mkdir -p ${EASYBUILD_DIR} ${EASYBUILD_PREFIX}"
 su - ${EASYBUILD_USER} -c "curl -O https://raw.githubusercontent.com/easybuilders/easybuild-framework/develop/easybuild/scripts/bootstrap_eb.py"
