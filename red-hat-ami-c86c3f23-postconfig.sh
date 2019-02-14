@@ -1,4 +1,4 @@
-#!/bin/bashp
+#!/bin/bash
 
 ##############################################
 #                                            #
@@ -215,7 +215,7 @@ sed -i -e 's/bin\/go/go\/bin\/go/g' -e "s/'api', 'doc', 'lib', 'pkg'/'go\/api', 
 su - ${EASYBUILD_USER} -c "source /etc/profile.d/easybuild.sh; source /etc/profile.d/lmod.sh; module load EasyBuild/3.8.1; eb --try-software-version=1.11.5 Go-1.8.1.eb; sed -i 's/Go\/1.11.5/Go\/1.11.5\/go/g' ${HEAD}/${OS}/${OS_VERSION}/Haswell/modules/all/Go/1.11.5.lua; sed -i '27i prepend_path(\"PATH\", \"/scratch/scicomp/EasyBuild/CentOS/7.5.1810/Haswell/software/Go/1.11.5/go/bin\")' ${HEAD}/${OS}/${OS_VERSION}/Haswell/modules/all/Go/1.11.5.lua"
 module load Go
 
-export SINGULARITY_VERSION="latest"
+export SINGULARITY_VERSION="master"
 export SINGULARITY_PREFIX="${HEAD}/${OS}/${OS_VERSION}/Common/software/Singularity/$SINGULARITY_VERSION"
 mkdir -p /root/go
 export GOPATH="/root/go"
