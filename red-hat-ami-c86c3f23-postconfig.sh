@@ -123,7 +123,7 @@ cd Lmod-${LMOD_VERSION}
 ./configure --prefix=${LMOD_PREFIX} && make install
 
 # Add path to modules to the MODULEPATH variable for the shell BASH
-sed -i '28iexport MODULEPATH=$(/scratch/scicomp/CentOS/7.5.1810/Common/software/Lmod/7.8.18/lmod/lmod/libexec/addto --append MODULEPATH /scratch/scicomp/CentOS/7.5.1810/Haswell/modules/all)' ${HEAD}/${OS}/${OS_VERSION}/Common/software/Lmod/${LMOD_VERSION}/lmod/lmod/init/profile
+sed -i "28iexport MODULEPATH=$\(${HEAD}/${OS}/${OS_VERSION}/Common/software/Lmod/${LMOD_VERSION}/lmod/lmod/libexec/addto --append MODULEPATH ${HEAD}/${OS}/${OS_VERSION}/Haswell/modules/all\)" ${HEAD}/${OS}/${OS_VERSION}/Common/software/Lmod/${LMOD_VERSION}/lmod/lmod/init/profile
 ln -s ${HEAD}/${OS}/${OS_VERSION}/Common/software/Lmod/${LMOD_VERSION}/lmod/lmod/init/profile /etc/profile.d/lmod.sh
 
 # Set environment to install EasyBuild
